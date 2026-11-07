@@ -64,8 +64,10 @@ namespace AkilliKisayol {
    if(SendInput((uint)inputs.Count,inputs.ToArray(),Marshal.SizeOf(typeof(INPUT)))!=inputs.Count)throw new Win32Exception("Text could not be sent; check the target's permissions.");
   }
   public static void SendRaw(params int[] keys){var inputs=keys.Select(k=>KeyInput(Math.Abs(k),k<0)).ToArray();if(SendInput((uint)inputs.Length,inputs,Marshal.SizeOf(typeof(INPUT)))!=inputs.Length)throw new Win32Exception("Shortcut key could not be sent to the source application.");}
+  static readonly bool[] Extended=ExtendedKeys();
+  static bool[] ExtendedKeys(){var table=new bool[256];foreach(int key in new[]{33,34,35,36,37,38,39,40,45,46,91,92,111,144,165,163,173,174,175,176,177,179})table[key]=true;return table;}
   static INPUT KeyInput(int key,bool up) {
-   bool extended=new[]{33,34,35,36,37,38,39,40,45,46,91,92,111,144,165,163,173,174,175,176,177,179}.Contains(key);
+   bool extended=key>=0&&key<Extended.Length&&Extended[key];
    return new INPUT {type=1,u=new InputUnion {key=new KEYBDINPUT {vk=(ushort)key,flags=(uint)((up?2:0)|(extended?1:0)),extra=new UIntPtr(0x414B534D)}}};
   }
  }
