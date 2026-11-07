@@ -70,6 +70,7 @@ namespace AkilliKisayol {
   }
  }
  public sealed class KeyboardEngine : IDisposable {
+  static readonly string OwnPath=System.Reflection.Assembly.GetExecutingAssembly().Location;
   internal bool AllowOwnPointerForTest;readonly PointerEngine pointer;IntPtr cachedWindow;string cachedPath="";DateTime cacheUntil;
   readonly Native.HookProc callback; readonly IntPtr hook;
   readonly HashSet<int> pressed=new HashSet<int>(); readonly HashSet<int> blocked=new HashSet<int>();
@@ -81,7 +82,7 @@ namespace AkilliKisayol {
   public event Action<PhysicalKey> PhysicalInput;
   public Func<PhysicalKey,bool> InputObserver;
   public int CurrentMods {get{return Mods;}}
-  internal bool WouldHandlePointer(int key){if(Paused||pressed.Contains(165))return false;IntPtr window=Native.GetForegroundWindow();string app=ForegroundPath(window);if(!AllowOwnPointerForTest&&Rules.SameApp(app,System.Reflection.Assembly.GetExecutingAssembly().Location))return false;return Bindings!=null&&Rules.Resolve(Bindings(),Mods,key,app,prefixKey>0&&!prefixForwarded&&Mods==prefixMods?prefixKey:0)!=null;}
+  internal bool WouldHandlePointer(int key){if(Paused||pressed.Contains(165))return false;IntPtr window=Native.GetForegroundWindow();string app=ForegroundPath(window);if(!AllowOwnPointerForTest&&Rules.SameApp(app,OwnPath))return false;return Bindings!=null&&Rules.Resolve(Bindings(),Mods,key,app,prefixKey>0&&!prefixForwarded&&Mods==prefixMods?prefixKey:0)!=null;}
   internal void ScheduleGesture(Binding binding,IntPtr window){if(!Paused&&Capture==null&&Native.GetForegroundWindow()==window)Queue(binding,window);}
   public void ResetPending(){pending=null;replay.Clear();prefixUsed=true;timer.Stop();cacheUntil=DateTime.MinValue;}
   bool flushPosted,disposed;
@@ -126,7 +127,7 @@ namespace AkilliKisayol {
     }
     if(eat) return true;
     if(!up && !repeat && !Paused && !Native.Modifier(key) && !pressed.Contains(165)) {
-     IntPtr window=Native.GetForegroundWindow();string app=ForegroundPath(window);if(!AllowOwnPointerForTest&&InputKeys.IsPointer(key)&&Rules.SameApp(app,System.Reflection.Assembly.GetExecutingAssembly().Location))return false;
+     IntPtr window=Native.GetForegroundWindow();string app=ForegroundPath(window);if(!AllowOwnPointerForTest&&InputKeys.IsPointer(key)&&Rules.SameApp(app,OwnPath))return false;
      var bindings=Bindings==null?new List<Binding>():Bindings();
      if(prefixKey>0&&!prefixForwarded){
       if(window!=prefixWindow){prefixUsed=true;return false;}
