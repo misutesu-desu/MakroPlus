@@ -129,8 +129,10 @@ namespace AkilliKisayol {
     }
     if(eat) return true;
     if(!up && !repeat && !Paused && !Native.Modifier(key) && !pressed.Contains(165)) {
-     IntPtr window=Native.GetForegroundWindow();string app=ForegroundPath(window);if(!AllowOwnPointerForTest&&InputKeys.IsPointer(key)&&Rules.SameApp(app,OwnPath))return false;
-     var bindings=Bindings==null?new List<Binding>():Bindings();
+     IntPtr window=Native.GetForegroundWindow();var bindings=Bindings==null?new List<Binding>():Bindings();int mods=Mods;
+     // The process path costs OpenProcess/QueryFullProcessImageName; skip it for keys no binding can use.
+     string app=InputKeys.IsPointer(key)||bindings.Any(item=>item.Enabled&&item.Mods==mods&&(item.Key==key||item.PrefixKey==key))?ForegroundPath(window):"";
+     if(!AllowOwnPointerForTest&&InputKeys.IsPointer(key)&&Rules.SameApp(app,OwnPath))return false;
      if(prefixKey>0&&!prefixForwarded){
       if(window!=prefixWindow){prefixUsed=true;return false;}
       var chord=Rules.Resolve(bindings,Mods,key,app,prefixKey);
