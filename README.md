@@ -19,8 +19,11 @@ review its plan, then run it directly with your chosen input.
 
 ## Download
 
-On GitHub, open this repository's **Releases** page and download
-`MakroPlus-2.6.2-win-x64.zip`. Extract it before running `MakroPlus.exe`.
+**[Download Makro+ 2.6.2 for Windows x64](https://github.com/yafermys/MakroPlus/releases/download/v2.6.2/MakroPlus-2.6.2-win-x64.zip)**
+
+[All releases](https://github.com/yafermys/MakroPlus/releases) · [Matching source archive](https://github.com/yafermys/MakroPlus/releases/download/v2.6.2/MakroPlus-2.6.2-source.zip)
+
+Extract the Windows ZIP before running `MakroPlus.exe`.
 The matching `.sha256` file verifies the ZIP. GitHub's source archives contain
 source code, not a ready-to-run Windows app. This release is unsigned.
 
@@ -47,6 +50,22 @@ Open **Tools & settings → Appearance**, or **Settings → Customize appearance
 Select a starting theme, then choose **Create theme**. The designer offers a color picker and editable `#RRGGBB` fields for backgrounds, cards/sidebar, controls, text, secondary text, borders, selections, primary accent/button text, peach accent and home banner. It previews changes without applying them until **Save and apply**. Give the palette a name and choose its light/dark classification. Invalid color values cannot be saved; a persistence failure keeps edits available for retry.
 
 Custom themes appear alongside presets. Select one to **Edit selected** or **Delete selected**; presets are preserved. **Export selected** writes a palette-only `.makrotheme.json` file, and **Import theme** adds an independently identified copy shared by someone else. No account or online service is required. Theme files contain colors and names, without shortcuts, API keys or model settings. Imports validate format, version and opaque color values; they cannot overwrite built-in theme identities. Settings transfers also preserve custom palettes, resolving identity collisions so existing colors are kept. Invalid stored palettes fall back to a preset at startup.
+
+## Recommended model
+
+**[Qwen3.5-4B Q4_0 GGUF — download and setup](docs/RECOMMENDED_MODEL.md)**
+
+This is the approximately **2.58 GB** Unsloth GGUF file used in development
+verification. The linked file's SHA-256 matches the tested local model. Copy it
+into `models`, select it in **AI model → Configure model**, then generate a
+preview. The first request loads it; saved shortcuts run without another model
+request. This recommendation is optional; compatible alternatives remain available.
+
+**[Download the verified model](https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/e87f176479d0855a907a41277aca2f8ee7a09523/Qwen3.5-4B-Q4_0.gguf?download=true)**
+
+No model weights are included in the repository or release ZIP. The model has
+its own Apache-2.0 license; Makro+ source uses GPL-3.0-only. Local memory usage
+includes runtime/context overhead beyond the model file size.
 
 ## Bring your own model
 
