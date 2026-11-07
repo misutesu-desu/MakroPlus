@@ -77,7 +77,7 @@ namespace AkilliKisayol {
  }
  public partial class MainWindow : Window {
   readonly State state;readonly string settingsFile;readonly KeyboardEngine engine;readonly Forms.NotifyIcon tray;
-  readonly System.Windows.Threading.DispatcherTimer historySave=new System.Windows.Threading.DispatcherTimer();bool historyDirty;
+  readonly System.Windows.Threading.DispatcherTimer historySave=new System.Windows.Threading.DispatcherTimer();bool historyDirty;Task historyWrite;
   readonly Grid content=new Grid();readonly TextBlock heading=Theme.Text("",28);readonly TextBlock subtitle=Theme.Text("",13,"Muted");
   readonly TextBox search=new TextBox{MinWidth=210,Width=300};readonly ComboBox source=new ComboBox{Width=180,Margin=new Thickness(10,0,0,0)};
   readonly DataGrid table=new DataGrid(); readonly TextBlock detail=Theme.Text("Select a record.",12,"Muted");
@@ -86,7 +86,7 @@ namespace AkilliKisayol {
   string view="Home";Button pause,editRow,toggleRow,deleteRow,restoreRow,sourceRow;
   public MainWindow(State data,string settingsPath=null) {
    settingsFile=settingsPath??Storage.FilePath;state=data;ThemeCatalog.Normalize(state);if(state.ModelOptions==null)state.ModelOptions=new ModelOptions();Actions.StepIntervalMs=state.StepIntervalMs??15;Profiles.Normalize(state);Theme.Apply(state.ThemeId,state.Dark,state.CustomThemes);Style=(Style)Application.Current.FindResource(typeof(Window));Title="Makro+";Width=1320;Height=860;MinWidth=1000;MinHeight=650;WindowStartupLocation=WindowStartupLocation.CenterScreen;Brand.Fit(this);
-   historySave.Interval=TimeSpan.FromMilliseconds(750);historySave.Tick+=(s,e)=>{historySave.Stop();if(historyDirty){historyDirty=false;Save();}};
+   historySave.Interval=TimeSpan.FromMilliseconds(750);historySave.Tick+=(s,e)=>{historySave.Stop();if(historyDirty){historyDirty=false;SaveHistory();}};
    engine=new KeyboardEngine{Bindings=()=>Profiles.Effective(state),Paused=state.Paused,AllowRemappedInput=state.AllowRemappedInput};
    engine.Fire=(b,w)=>Actions.Run(b,w,result=>Log(b.Name,result));engine.Fault=message=>Log("Input engine",message);
    InitializeFeatures();
@@ -106,7 +106,7 @@ namespace AkilliKisayol {
    table.MouseDoubleClick+=(s,e)=>EditSelected();
    tray=new Forms.NotifyIcon{Text="Makro+",Icon=Brand.TrayIcon(),Visible=true};
    var menu=new Forms.ContextMenuStrip();menu.Items.Add("Show",null,(s,e)=>Restore());menu.Items.Add("Pause / resume",null,(s,e)=>pause.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)));var profileMenu=new Forms.ToolStripMenuItem("Profile");profileMenu.DropDownOpening+=(s,e)=>{profileMenu.DropDownItems.Clear();foreach(var item in state.Profiles){string id=item.Id;var choice=new Forms.ToolStripMenuItem(item.Name){Checked=id==state.ActiveProfileId};choice.Click+=(a,b)=>SwitchProfile(id);profileMenu.DropDownItems.Add(choice);}};menu.Items.Add(profileMenu);menu.Items.Add("Toggle touchpad shapes",null,(s,e)=>{SetGestureEnabled(!state.Gestures.Enabled);Render();});menu.Items.Add("Exit",null,(s,e)=>Close());tray.ContextMenuStrip=menu;tray.DoubleClick+=(s,e)=>Restore();
-   Closed+=(s,e)=>{closed=true;historySave.Stop();if(historyDirty)Save();gestures.Dispose();guide.Dispose();Actions.CancelWorkflow();LocalLlm.Shared.Dispose();engine.Dispose();tray.Dispose();};UpdatePause();Render();
+   Closed+=(s,e)=>{closed=true;historySave.Stop();if(historyDirty||historyWrite!=null&&historyWrite.Status!=TaskStatus.RanToCompletion)Save();gestures.Dispose();guide.Dispose();Actions.CancelWorkflow();LocalLlm.Shared.Dispose();engine.Dispose();tray.Dispose();};UpdatePause();Render();
    Loaded+=(s,e)=>{if(!Environment.GetCommandLineArgs().Contains("--self-test"))ScanLinks();};
    foreach(var b in state.Bindings.Where(b=>b.Enabled)) {string error=Rules.Validate(b,state.Bindings);if(error!=null){b.Enabled=false;Log(b.Name,"Safe install: disabled • "+error);}}
    Refresh();
@@ -114,6 +114,8 @@ namespace AkilliKisayol {
   void Restore(){Show();WindowState=WindowState.Normal;Activate();}
   void UpdatePause(){pause.Content=state.Paused?"▶ Resume shortcuts":"Ⅱ Pause shortcuts";string text="Makro+ • "+Profiles.Name(state)+(state.Paused?" • paused":"");tray.Text=text.Length>63?text.Substring(0,63):text;}
   bool Save(){try{Storage.Write(state,settingsFile);return true;}catch(Exception e){MessageBox.Show(this,"Could not save settings: "+e.Message,"Disk error");return false;}}
+  // The fsync runs off the UI thread: the input hooks are serviced there, so a slow disk would stall typing system-wide.
+  void SaveHistory(){Storage.Snapshot snapshot;try{snapshot=Storage.Capture(state);}catch(Exception e){MessageBox.Show(this,"Could not save settings: "+e.Message,"Disk error");return;}string file=settingsFile;historyWrite=Task.Run(()=>Storage.Write(snapshot,file));historyWrite.ContinueWith(t=>{historyDirty=true;if(!closed)MessageBox.Show(this,"Could not save settings: "+t.Exception.GetBaseException().Message,"Disk error");},CancellationToken.None,TaskContinuationOptions.OnlyOnFaulted,TaskScheduler.FromCurrentSynchronizationContext());}
   void Log(string name,string result){state.History.Insert(0,new Activity{Time=DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz"),Name=name,Result=result});if(state.History.Count>200)state.History.RemoveRange(200,state.History.Count-200);historyDirty=true;if(!historySave.IsEnabled)historySave.Start();status.Text=result;if(view=="History")Render();}
   StackPanel Header(string title,string note){var p=new StackPanel{Margin=new Thickness(0,0,0,22)};heading.Text=title;subtitle.Text=note;p.Children.Add(heading);p.Children.Add(subtitle);return p;}
   void Render(){if(gestures!=null)gestures.Refresh();
