@@ -1,0 +1,20 @@
+MAKRO+ SOURCE CODE — GPL-3.0-only
+
+The source for this version is supplied as MakroPlus-2.6.2-source.zip in the
+same release. The matching repository tag also provides GitHub source archives.
+The Windows application, source code and original project assets use the
+GNU General Public License version 3 only; see LICENSE for the complete text.
+Independent third-party components retain their own licenses; see
+THIRD_PARTY_NOTICES.md and runtime/llama/LICENSE*.
+
+Build on Windows x64 with .NET Framework 4.8:
+  powershell -NoProfile -ExecutionPolicy Bypass -File setup-runtime.ps1
+  powershell -NoProfile -ExecutionPolicy Bypass -File build.ps1
+
+setup-runtime.ps1 downloads the pinned upstream llama.cpp runtime and verifies
+its SHA-256. Model weights are neither required for compilation nor supplied.
+Run test.ps1 on an interactive desktop for the controlled native self-check.
+See README.md and CONTRIBUTING.md for additional tests and packaging.
+
+The Windows compiler, framework and platform components are separately supplied
+by Microsoft. This source does not require a private Makro+ build service.

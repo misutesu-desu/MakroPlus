@@ -1,0 +1,52 @@
+# Generated builds, release archives, runtime downloads and user models
+/dist/
+/release/
+/runtime/
+/models/
+*.gguf
+*.safetensors
+*.onnx
+*.pt
+*.pth
+*.bin
+*.zip
+*.7z
+*.exe
+*.dll
+*.pdb
+*.obj
+
+# User data and credentials
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+settings.json
+settings.json.*
+*.makrotheme.json
+*.akilli-kisayol.bak
+*.log
+*.tmp
+*.bak
+
+# Historical translation intermediates are not build inputs
+/assets/*.json
+/assets/design/
+/scripts/apply-english.ps1
+/scripts/CSharpStrings.ps1
+/scripts/finish-english.ps1
+/scripts/refresh-ui-english.ps1
+/scripts/translate-ui.ps1
+
+# Local IDE and OS state
+.vs/
+.vscode/
+.idea/
+obj/
+bin/
+*.user
+*.suo
+Thumbs.db
+.DS_Store

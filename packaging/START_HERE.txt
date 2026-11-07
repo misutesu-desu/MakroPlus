@@ -1,0 +1,161 @@
+MAKRO+ 2.6.2 — WINDOWS 10/11 x64
+
+GET STARTED
+1. Extract the entire ZIP. Do not run the executable inside the ZIP.
+2. Open MakroPlus.exe for portable use, or run Install.cmd to create a
+   per-user installation with Start menu and desktop shortcuts.
+3. .NET Framework 4.8 is required. Install.cmd checks prerequisites and
+   uses the bundled, Microsoft-signed Visual C++ runtime when needed.
+4. Keep the runtime folder next to the executable. NO LANGUAGE MODEL
+   WEIGHTS ARE INCLUDED. Basic shortcuts and saved plans need no model.
+
+FULL USER GUIDE
+Open USER_GUIDE.html, or Settings > Open user guide inside Makro+.
+It covers prompts, models, closed applications, every input, themes,
+profiles, settings, backup and troubleshooting.
+
+YOUR MODEL
+Open AI model > Configure model, or Change model in the prompt editor.
+Open models folder and copy your downloaded .gguf into models next to
+MakroPlus.exe. One file is detected automatically if none was selected.
+For several files, use Browse GGUF to choose. Refresh after copying.
+Files selected inside models keep a relative path when the app moves.
+You may also browse to your own model elsewhere on this computer.
+The embedded chat template is used; supported architectures depend on
+the bundled llama.cpp runtime. Use an instruction-following chat model.
+The first request loads the model; later requests reuse it and its prompt
+cache. GPU startup failure falls back to the same model on the CPU.
+Fast planning can disable optional reasoning; turn it off if preferred.
+
+Compatible API server: enter the API base URL and exact model ID exposed
+by your server. Examples: http://localhost:1234/v1/ or a hosted server's
+documented compatible base URL. Enter an API key only when needed.
+Prompts and registered application context go to that chosen server.
+Keys are encrypted for your Windows account and excluded from exports.
+Unsupported JSON, temperature and token parameters adapt automatically.
+You can also disable structured output. Increase Maximum output tokens
+if a reasoning model stops before returning its final plan.
+Every generated plan is validated and previewed before saving.
+
+FASTER PLAYBACK
+Saved shortcuts run directly, without asking the language model again.
+Settings > Playback speed offers 0, 15, 50, 100 or 250 ms between steps.
+The default is 15 ms. Explicit Wait steps and recorded pauses are kept.
+Choose a slower setting if an application misses rapid input.
+
+FIND YOUR WAY
+The main window has no native white title bar. Use the top-right controls
+to minimize, maximize/restore or close it. Drag the empty top edge to move
+the window, or double-click it to maximize/restore. Maximizing keeps the
+taskbar work area available on the current monitor.
+Navigation categories are separated into framed OVERVIEW, INPUTS,
+WORKSPACE and TOOLS & SETTINGS groups. The active page has a colored rail
+and a bold label.
+Home offers Describe a task, Record your actions and Assign directly.
+Inputs and Workspace contain everyday tools. Tools & settings
+contains profiles, preferences, guide, conflicts, history and transfer.
+Prompt editing starts with the request and preview; trigger, app and
+provider options are grouped under advanced options.
+INPUTS includes Keyboard shortcuts, Mouse shortcuts and Touchpad gestures.
+Keyboard shortcuts defaults to your personal keyboard-triggered entries;
+disabled assignments remain visible for editing.
+
+THEMES
+Open Tools & settings > Appearance, or Settings > Customize appearance.
+Dark: Graphite (charcoal), Midnight (navy), Forest (evergreen).
+Light: Paper (neutral), Mist (blue-gray), Sand (beige).
+Coral and peach are secondary accents for actions, selections and badges.
+Click a theme to apply and save it immediately. It is restored at startup
+and included in settings transfers. Legacy light/dark settings are kept
+through the closest neutral default.
+
+CUSTOM THEMES
+1. Select any theme as your starting point, then choose Create theme.
+2. Give it a name. Pick colors using the swatches or type #RRGGBB values.
+3. Review the live preview, then Save and apply to add it to the gallery.
+4. Select a custom palette to Edit selected or Delete selected.
+5. Use Export selected to share a .makrotheme.json palette file. Use
+   Import theme to add a palette received from someone else.
+Preset palettes are preserved. Custom themes survive restart and settings
+transfers. A shared theme file contains palette data only, without your
+shortcuts, API keys or model settings. No account is needed.
+
+KEYBOARD AND MOUSE
+Use All shortcuts, Mouse shortcuts or Prompt shortcuts. Standard Windows
+keys, media/browser keys, numpad/OEM keys, five mouse buttons and four
+wheel directions are supported, including high-resolution wheel input.
+Ctrl/Alt/Shift combinations are available. Capture a physical input or
+type tokens such as XButton1, Ctrl+WheelUp or Ctrl+MediaPlayPause.
+
+For vendor utilities that generate software-remapped input, enable
+"Accept software-remapped keyboard and mouse inputs" in Settings.
+Makro+ playback never triggers itself. Firmware-only Fn keys, extra
+vendor buttons and proprietary gestures depend on what the driver
+exposes to Windows. No application can guarantee every hardware model.
+
+CONTINUOUS TOUCHPAD SHAPES — NO ACTIVATION KEY
+1. Open Touchpad gestures. Continuous recognition is the default mode.
+2. Windows Precision Touchpad input is selected initially. If your driver
+   uses a legacy pointer device, click Detect my touchpad, then move only
+   one finger on your touchpad. This calibrates the pointer source.
+3. Choose Add a shape, enter a name and profile, then Record shape.
+4. Move one finger to draw a distinctive shape WITHOUT holding a key or
+   pressing a mouse button. Pause briefly to finish the recording.
+5. Choose an existing shortcut action or use Create / edit action.
+   Review the trace and action, then save.
+6. Switch to the target application. Draw the saved shape and pause;
+   a confident match runs the action. Ambiguous matches do nothing.
+
+CREATE A TOUCHPAD SHORTCUT WITH A PROMPT
+1. Touchpad gestures > Create with prompt.
+2. Record your shape, then choose Describe action with prompt.
+3. Describe only the action: "Select all text and copy it", "Press Ctrl+S"
+   or "Open YouTube in Brave". The recorded shape is already the trigger.
+4. Review the model's steps, choose Use this action, then Save shape shortcut.
+You do not need to assign a keyboard key. This flow uses the same AI model
+and application settings as other prompt shortcuts. Existing shapes can
+also receive a new prompt-created action through Edit shape / action.
+The rule interpreter supports simple English text, waits, copy/select and
+key actions as an offline alternative. Saved actions run without a model.
+
+Normal cursor movement continues while listening. Recognition is paused
+inside Makro+ and while editing, recording a macro or running a workflow.
+Use distinctive shapes, and adjust pause/confidence on the gesture page.
+You can disable continuous recognition on that page or from the tray.
+This feature recognizes one-finger pointer paths. It does not replace
+Windows three/four-finger gestures or change touchpad driver settings.
+
+MACRO RECORDING
+F10 stops a recording. Double-click a step to edit its button, position,
+hold duration, scroll direction or target. Add, duplicate and reorder
+steps as needed. Optional proportional positioning adapts to window size;
+check layouts on a new device. Escape cancels the remaining workflow.
+
+TRANSFER AND RECOVERY
+Use Transfer and diagnostics to export/import shortcuts, profiles,
+application preferences and saved shapes. Match .exe paths on the new
+computer, and recalibrate a legacy touchpad source if needed.
+Existing shortcuts are preserved. Invalid/conflicting imports remain
+disabled. External Windows/VS Code shortcut files are rescanned locally.
+Settings remain in %LOCALAPPDATA%\AkilliKisayol for compatibility.
+Legacy action identifiers/default profiles are migrated to English;
+user-entered names, text and prompts are preserved.
+Uninstall-MakroPlus.ps1 removes a per-user installation, preserving data.
+
+TESTS AND COMPATIBILITY
+See TEST-RESULTS.txt and package-manifest.json. Automated recognition,
+event, UI, persistence, compatibility and real local-model tests run on
+the development computer. Different physical keyboards, mice, touchpads,
+firmware versions and Windows installations have not all been tested.
+The app uses standard Windows input APIs; driver/OS limitations still
+apply. This build is unsigned; Windows may show publisher information.
+
+Runtime: https://github.com/ggml-org/llama.cpp (MIT license included).
+Models: user-selected; none included in this package.
+Microsoft runtime: https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist
+
+CLOSED APPLICATIONS
+Applications do not need to run when you create their shortcuts.
+Register their .exe files and choose them as scope or destination.
+Use Global scope to launch a closed app from anywhere. Screen/key
+actions need a target window when the saved shortcut actually runs.

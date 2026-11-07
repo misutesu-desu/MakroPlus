@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+
+namespace AkilliKisayol {
+ public sealed class ModelIntent {
+  public readonly List<string> LiteralText=new List<string>();
+  public readonly List<int> Waits=new List<int>();
+  public bool SelectedOnly,OpenOnly;
+  string original;
+  public static ModelIntent Read(string prompt){var result=new ModelIntent();prompt=prompt??"";result.original=prompt;var masked=prompt.ToCharArray();foreach(Match quote in Regex.Matches(prompt,"[\"“](?<value>.*?)[\"”]",RegexOptions.Singleline)){string prefix=prompt.Substring(0,quote.Index);if(Regex.IsMatch(prefix,@"\b(?:type|write)\s*$",RegexOptions.IgnoreCase)&&!Regex.IsMatch(prefix,@"\b(?:not|never)\s+(?:type|write)\s*$",RegexOptions.IgnoreCase))result.LiteralText.Add(quote.Groups["value"].Value);for(int i=quote.Index;i<quote.Index+quote.Length;i++)masked[i]=' ';}string clean=new string(masked);foreach(Match wait in Regex.Matches(clean,@"\bwait\s+(?<n>\d+(?:\.\d+)?)\s*(?<unit>milliseconds?|ms|seconds?|s)\b",RegexOptions.IgnoreCase)){if(Regex.IsMatch(clean.Substring(0,wait.Index),@"\b(?:not|never|don't)\s*$",RegexOptions.IgnoreCase))continue;double value=double.Parse(wait.Groups["n"].Value,CultureInfo.InvariantCulture)*(wait.Groups["unit"].Value.StartsWith("s",StringComparison.OrdinalIgnoreCase)?1000:1);if(value>=0&&value<=10000&&Math.Abs(value-Math.Round(value))<0.0001)result.Waits.Add((int)Math.Round(value));}result.SelectedOnly=Regex.IsMatch(clean,@"\bcopy\s+(?:the\s+)?(?:selected\s+(?:text|content)|selection)\b",RegexOptions.IgnoreCase)&&!Regex.IsMatch(clean,@"\b(?:select\s+all|all\s+text)\b",RegexOptions.IgnoreCase);string action=Regex.Split(clean,@"\bwhen\s+i\s+press\b",RegexOptions.IgnoreCase)[0];result.OpenOnly=Regex.IsMatch(action,@"^\s*open\s+https?://",RegexOptions.IgnoreCase)&&!Regex.IsMatch(action,@"\b(?:then|and|type|write|copy|paste|click|save|press|key|script|powershell|command)\b",RegexOptions.IgnoreCase);return result;}
+  public object Hints(){return new{literal_text=LiteralText.ToArray(),explicit_wait_ms=Waits.ToArray(),preserve_current_selection=SelectedOnly,open_resource_only=OpenOnly};}
+  public void Validate(Binding binding){if(binding.Kind!="Workflow"||binding.Steps==null)return;var steps=binding.Steps;bool simple=steps.All(s=>s.Kind=="Key"||s.Kind=="Text"||s.Kind=="Wait");if(simple&&LiteralText.Count>0&&!steps.Where(s=>s.Kind=="Text").Select(s=>s.Text).SequenceEqual(LiteralText))throw new InvalidDataException("The plan must type the user's exact quoted text using text steps, without replacing it with copy/paste actions.");if(simple&&Waits.Count>0&&!steps.Where(s=>s.Kind=="Wait").Select(s=>s.Delay).SequenceEqual(Waits))throw new InvalidDataException("The plan changed an explicitly requested wait duration. Use these exact milliseconds in order: "+string.Join(", ",Waits)+".");if(simple&&LiteralText.Count>0){var expected=PromptParser.Parse(original,new string[0],binding.AppPath,TriggerSpec.Format(binding.Mods,binding.Key,binding.PrefixKey),binding.Gesture);if(expected.Ready&&!expected.Binding.Steps.Select(Signature).SequenceEqual(steps.Select(Signature)))throw new InvalidDataException("Preserve the exact action order requested by the user: "+string.Join(" → ",expected.Binding.Steps.Select(s=>s.Summary))+".");}if(SelectedOnly&&steps.Any(s=>s.Kind=="Key"&&s.Mods==2&&s.Key==65))throw new InvalidDataException("Copy only the current selection. The user did not request select-all; remove Ctrl+A/select_all.");if(OpenOnly&&steps.Any(s=>s.Kind=="Key"||s.Kind=="Text"||s.Kind=="Click button"))throw new InvalidDataException("The user only requested opening a resource. Remove unrelated keyboard, clipboard and click steps.");}
+  static string Signature(ActionStep step){return step.Kind+"|"+step.Mods+"|"+step.Key+"|"+step.Delay+"|"+step.Text;}
+ }
+}

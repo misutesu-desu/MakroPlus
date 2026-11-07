@@ -1,0 +1,33 @@
+name: Windows build
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Check publication contents
+        shell: powershell
+        run: .\scripts\verify-publication.ps1
+      - name: Download and verify pinned runtime
+        shell: powershell
+        run: .\setup-runtime.ps1
+      - name: Compile Windows app
+        shell: powershell
+        run: .\build.ps1 -OutputDirectory dist\ci
+      - name: Retain build output
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: makroplus-windows-build
+          path: dist/ci/
+          retention-days: 14
+          if-no-files-found: error
+
+# Native input tests require an interactive desktop; run test.ps1 locally.
+# No model weights, API keys or repository write credentials are needed here.
